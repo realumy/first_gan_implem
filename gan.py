@@ -1,15 +1,13 @@
-import sys
-import numpy as np
-from IPython.core.debugger import Tracer
-from keras.datasets import mnist
-from keras.layers import Input, Dense, Reshape, Flatten, Dropout
-from keras.layers import BatchNormalization
-from keras.layers.advanced_activations import LeakyReLU
-from keras.models import Sequential, Model
-from keras.optimizers import Adam, RMSprop
-import matplotlib.pyplot as plt
-import pickle as pkl
 import gzip
+import pickle as pkl
+
+import matplotlib.pyplot as plt
+import numpy as np
+from keras.layers import BatchNormalization
+from keras.layers import Dense, Reshape, Flatten
+from keras.layers.advanced_activations import LeakyReLU
+from keras.models import Sequential
+from keras.optimizers import Adam
 
 plt.switch_backend('agg')
 
@@ -67,7 +65,7 @@ class GAN(object):
         model.add(self.D)
         return model
 
-    def train(self, X_train, epochs=2000, batch=32, save_interval=200):
+    def train(self, X_train, epochs=20000, batch=32, save_interval=200):
         for cnt in range(epochs):
             ## train discriminator
             random_index = np.random.randint(0, len(X_train) - int(batch / 2))
