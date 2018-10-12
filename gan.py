@@ -2,18 +2,21 @@ import gzip
 import pickle as pkl
 
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import os.path
 import numpy as np
 from keras.layers import BatchNormalization
 from keras.layers import Dense, Reshape, Flatten
 from keras.layers.advanced_activations import LeakyReLU
 from keras.models import Sequential
 from keras.optimizers import Adam
+from keras.preprocessing.image import load_img, img_to_array
 
 plt.switch_backend('agg')
 
 
 class GAN(object):
-    def __init__(self, width=28, height=28, channels=1):
+    def __init__(self, width=96, height=96, channels=3):
         self.WIDTH = width
         self.HEIGHT = height
         self.CHANNELS = channels
@@ -72,7 +75,6 @@ class GAN(object):
             legit_images = X_train[random_index: random_index + int(batch / 2)].reshape(int(batch / 2), self.WIDTH,
                                                                                         self.HEIGHT,
                                                                                         self.CHANNELS)
-
             gen_noise = np.random.normal(0, 1, (int(batch / 2), 100))
             syntetic_images = self.G.predict(gen_noise)
             x_combined_batch = np.concatenate((legit_images, syntetic_images))
@@ -110,7 +112,7 @@ class GAN(object):
             plt.show()
 
 
-def load_data():
+def load_data_from_pkl():
     with gzip.open('mnist.pkl.gz', 'rb') as f:
         u = pkl._Unpickler(f)
         u.encoding = 'latin1'
@@ -121,8 +123,15 @@ def load_data():
     return (x_train, y_train), (x_test, y_test)
 
 
+def load_data_from_repository():
+    train_path = "../anime-faces/blonde_hair"
+    return np.array([np.array(img_to_array(load_img(os.path.join(train_path, file)), 'channels_last')) for file in
+                     os.listdir(train_path)])
+
+
 if __name__ == '__main__':
-    (X_train, _), (_, _) = load_data()
+    # (X_train, _), (_, _) = load_data_from_pkl()
+    X_train = load_data_from_repository()
     # Rescale -1 to 1
     X_train = (X_train.astype(np.float32) - 127.5) / 127.5
     X_train = np.expand_dims(X_train, axis=3)
